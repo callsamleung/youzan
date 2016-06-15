@@ -91,6 +91,9 @@ class YouZanClient(object):
             return None, APIError('9999', 'invald rsp')
         if 'error' in content:
             return None, APIError(content['error'], content['error_description'])
+        if 'error_response' in content:
+            return None, APIError(content['error_response']['code'],
+                                  content['error_response']['msg'])
         return content, None
 
     def get_resource(self, method, params={}):
