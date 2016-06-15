@@ -37,8 +37,9 @@ class YouZanClient(object):
     def access_token(self):
         return self._access_token
 
-    def set_access_token(self, token):
+    def set_access_token(self, token, left_time=604800):
         self._access_token = token
+        self.expires = int(time.time()) + left_time
 
     @property
     def redirect_url(self):
