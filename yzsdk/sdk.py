@@ -97,16 +97,12 @@ class YouZanClient(object):
         return content, None
 
     def get_resource(self, method, params={}):
-        if not self.is_valid:
-            return None, APIError('40010', 'access_token not exist or has expired')
         params['access_token'] = self._access_token
         params['method'] = method
         rsp = requests.get(self.resource_url, params=params, verify=False)
         return self._process_response(rsp)
 
     def post_resource(self, method, data={}):
-        if not self.is_valid:
-            return None, APIError('40010', 'access_token not exist or has expired')
         headers = {'Content-type': 'application/json'}
         url_args = 'method={}&access_token={}'.format(method, self._access_token)
         post_url = '{}?{}'.format(self.resource_url, url_args)
