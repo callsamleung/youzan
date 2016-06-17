@@ -9,7 +9,6 @@ class YouZanClient(object):
     access_token_url = "https://open.koudaitong.com/oauth/token"
     resource_url = "https://open.koudaitong.com/api/oauthentry"
     authorize_url = "https://open.koudaitong.com/oauth/authorize"
-    expires = 0
     _access_token = None
     state = 'teststate'
 
@@ -39,7 +38,6 @@ class YouZanClient(object):
 
     def set_access_token(self, token, left_time=604800):
         self._access_token = token
-        self.expires = int(time.time()) + left_time
 
     @property
     def redirect_url(self):
@@ -62,7 +60,6 @@ class YouZanClient(object):
         data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         rsp = requests.post(self.access_token_url, data=data, headers=headers, verify=False)
         content, error = self._process_response(rsp)
-        self.expires = int(time.time()) + content['expires_in']
         self.set_access_token(content['access_token'])
         return content, error
 
@@ -78,7 +75,6 @@ class YouZanClient(object):
         data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         rsp = requests.post(self.access_token_url, data=data, headers=headers, verify=False)
         content, error = self._process_response(rsp)
-        self.expires = int(time.time()) + content['expires_in']
         self.set_access_token(content['access_token'])
         return content, error
 
@@ -98,8 +94,6 @@ class YouZanClient(object):
 
     def get_resource(self, method, token=None, params={}):
         if not token:
-            if not self.is_valid:
-                return None, APIError(9911, 'client access_token is not valid,you can give token as parameters')
             params['access_token'] = self._access_token
         else:
             params['access_token'] = token
@@ -109,8 +103,6 @@ class YouZanClient(object):
 
     def post_resource(self, method, token=None, data={}):
         if not token:
-            if not self.is_valid:
-                return None, APIError(9911, 'client access_token is not valid,you can give token as parameters')
             post_token = self._access_token
         else:
             post_token = token
