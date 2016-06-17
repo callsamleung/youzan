@@ -96,15 +96,26 @@ class YouZanClient(object):
                                   content['error_response']['msg'])
         return content, None
 
-    def get_resource(self, method, params={}):
-        params['access_token'] = self._access_token
+    def get_resource(self, method, token=None, params={}):
+        if not token:
+            if not self.is_valid:
+                return None, APIError(9911, 'client access_token is not valid,you can give token as parameters')
+            params['access_token'] = self._access_token
+        else:
+            params['access_token'] = token
         params['method'] = method
         rsp = requests.get(self.resource_url, params=params, verify=False)
         return self._process_response(rsp)
 
-    def post_resource(self, method, data={}):
+    def post_resource(self, method, token=None, data={}):
+        if not token:
+            if not self.is_valid:
+                return None, APIError(9911, 'client access_token is not valid,you can give token as parameters')
+            post_token = self._access_token
+        else:
+            post_token = token
         headers = {'Content-type': 'application/json'}
-        url_args = 'method={}&access_token={}'.format(method, self._access_token)
+        url_args = 'method={}&access_token={}'.format(method, post_token)
         post_url = '{}?{}'.format(self.resource_url, url_args)
         data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         rsp = requests.post(post_url, data=data, headers=headers, verify=False)
