@@ -15,5 +15,5 @@ def callback(request):
     code = request.GET.get('code')
     access_token, error = client.get_access_token(code)
     print access_token
-    res = client.get_resource("kdt.itemcategories.tag.add", {'name': '8cvxc'})
+    res = client.get_resource("kdt.items.onsale.get")
     return HttpResponse(res)
