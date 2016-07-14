@@ -148,7 +148,7 @@ class YouZanDevelopClient(object):
         data = json.dumps(post_data, ensure_ascii=False).encode('utf-8')
         rsp = requests.post(self.access_token_url, data=data, headers=headers, verify=False)
         content, error = self._process_response(rsp)
-        self.set_access_token(content['access_token'])
+        self._access_token = content['access_token']
         return content, error
 
     def _get_resource(self, method, data):
