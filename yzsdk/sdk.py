@@ -119,6 +119,11 @@ class YouZanClient(object):
         rsp = requests.post(post_url, data=data, headers=headers, verify=False)
         return self._process_response(rsp)
 
+    def get_shop_info(self, token=None):
+        method = 'kdt.shop.basic.get '
+        content, error = self.get_resource(method=method, token=token)
+        return content, error
+
 class YouZanDevelopClient(object):
     access_token_url = "https://open.koudaitong.com/oauth/token"
     resource_url = "https://open.koudaitong.com/api/oauthentry"

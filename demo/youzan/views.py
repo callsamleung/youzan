@@ -18,3 +18,9 @@ def callback(request):
     access_token, error = client.get_access_token(code)
     print access_token
     return HttpResponse(access_token)
+
+def test(request):
+    token = '72ae51ee38693ca98cf6c850ba8917ba'
+    content, error = client.get_shop_info(token)
+    print content, error
+    return HttpResponse(content)
