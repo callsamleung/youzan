@@ -124,6 +124,7 @@ class YouZanClient(object):
         content, error = self.get_resource(method=method, token=token)
         return content, error
 
+
 class YouZanDevelopClient(object):
     access_token_url = "https://open.koudaitong.com/oauth/token"
     resource_url = "https://open.koudaitong.com/api/oauthentry"
@@ -141,9 +142,13 @@ class YouZanDevelopClient(object):
     def access_token(self, token):
         self._access_token = token
 
-    def sync_user(self, data):
+    def sync_user(self, user_id):
         sync_url = 'https://wap.koudaitong.com/v2/buyer/kdtunion/index.json?'
-        headers = {'Content-type': 'application/json'}
+        headers = {'Content-type': 'application/json', 'User-Agent': "KdtUnion_" + self._ua}
+        data = {
+            "user_id": user_id
+        }
+        print data, headers
         data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         rsp = requests.post(sync_url, data=data, headers=headers, verify=False)
         return self._process_response(rsp)
@@ -162,7 +167,7 @@ class YouZanDevelopClient(object):
         rsp = requests.post(self.access_token_url, data=data, headers=headers, verify=False)
         content, error = self._process_response(rsp)
         if error is None:
-            self._access_token = content['access_token']
+            self._access_token = content['accessToken']
         return content, error
 
     def _get_resource(self, method, data):
