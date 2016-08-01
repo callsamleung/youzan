@@ -190,7 +190,8 @@ class YouZanDevelopClient(object):
         if rsp.status_code != 200:
             return None, APIError(rsp.status_code, "http_error")
         try:
-            content = rsp.json()
+            rsp = rsp.json()
+            content = rsp['response']
         except:
             return None, APIError('9999', 'invald rsp')
         if 'message' in content:
