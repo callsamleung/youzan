@@ -176,7 +176,7 @@ class YouZanDevelopClient(object):
         params['method'] = method
         params.update(data)
         rsp = requests.get(self.resource_url, params=params, verify=False)
-        return self._process_response(rsp)
+        return self._process_response(rsp['response'])
 
     def _post_resource(self, method, data):
         headers = {'Content-type': 'application/json'}
@@ -184,14 +184,13 @@ class YouZanDevelopClient(object):
         post_url = '{}?{}'.format(self.resource_url, url_args)
         data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         rsp = requests.post(post_url, data=data, headers=headers, verify=False)
-        return self._process_response(rsp)
+        return self._process_response(rsp['response'])
 
     def _process_response(self, rsp):
         if rsp.status_code != 200:
             return None, APIError(rsp.status_code, "http_error")
         try:
-            rsp = rsp.json()
-            content = rsp['response']
+            content = rsp.json()
         except:
             return None, APIError('9999', 'invald rsp')
         if 'message' in content:
