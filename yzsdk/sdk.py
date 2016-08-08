@@ -193,7 +193,7 @@ class YouZanDevelopClient(object):
             content = rsp.json()
         except:
             return None, APIError('9999', 'invald rsp')
-        if 'code' in content and (int(content['code'] != 0):
+        if 'code' in content and (content['code'] != 0 or content['code'] != '0'):
             return None, APIError(content.get('code'), content.get('message'))
         if 'error' in content:
             return None, APIError(content.get('error'), content.get('error_description'))
