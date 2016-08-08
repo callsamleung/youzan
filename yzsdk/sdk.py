@@ -198,9 +198,11 @@ class YouZanDevelopClient(object):
             if message is None:
                 message = content.get('msg')
             return None, APIError(content.get('code'), message)
-        if 'error' in content:
+        elif 'error_code' in content and content['error_code'] != '0':
+            return None, APIError(content.get('error_code'), content.get('error_message'))
+        elif 'error' in content:
             return None, APIError(content.get('error'), content.get('error_description'))
-        if 'error_response' in content:
+        elif 'error_response' in content:
             return None, APIError(content['error_response'].get('code'),
                                   content['error_response'].get('msg'))
         return content, None
