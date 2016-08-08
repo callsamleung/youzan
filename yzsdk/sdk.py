@@ -193,7 +193,7 @@ class YouZanDevelopClient(object):
             content = rsp.json()
         except:
             return None, APIError('9999', 'invald rsp')
-        if 'message' in content:
+        if 'code' in content and (int(content['code'] != 0):
             return None, APIError(content.get('code'), content.get('message'))
         if 'error' in content:
             return None, APIError(content.get('error'), content.get('error_description'))
@@ -208,3 +208,6 @@ class APIError(object):
     def __init__(self, code, description):
         self.code = code
         self.description = description
+
+    def _repr__(self):
+        return 'YZError: The error code is %s and msg is %s' % (self.code, self.description)
