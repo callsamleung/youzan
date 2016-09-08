@@ -153,6 +153,12 @@ class YouZanDevelopClient(object):
         rsp = requests.post(sync_url, data=data, headers=headers, verify=False)
         return self._process_response(rsp)
 
+    def send_message_to_youzan(self, data):
+        request_url = self.resource_url + '/courier.fans.message/1.0.0/send'
+        headers = {'Content-type': 'application/json'}
+        data = json.dumps(data, ensure_ascii=False).encode('utf-8')
+        rsp = requests.post(request_url, data=data, headers=headers, verify=False)
+        return self._process_response(rsp)
 
     def get_token(self, user_id, scope=None):
         headers = {'Content-type': 'application/json'}
