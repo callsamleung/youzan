@@ -199,7 +199,7 @@ class YouZanDevelopClient(object):
             content = rsp.json()
         except:
             return None, APIError('9999', 'invald rsp')
-        if 'code' in content and (content['code'] != 0 or content['code'] != '0'):
+        if 'code' in content and str(content['code']) != '0':
             message = content.get('message')
             if message is None:
                 message = content.get('msg')
