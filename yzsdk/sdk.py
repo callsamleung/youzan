@@ -124,6 +124,11 @@ class YouZanClient(object):
         content, error = self.get_resource(method=method, token=token)
         return content, error
 
+    def get_order_info_on_buyer_id(self, buyer_id, token=None):
+        method = 'kdt.trades.sold.get'
+        content_error = self.get_resource(method=method, token=token, params={'buyer_id': buyer_id})
+        return content, error
+
 
 class YouZanDevelopClient(object):
     access_token_url = "https://open.koudaitong.com/oauth/token"
