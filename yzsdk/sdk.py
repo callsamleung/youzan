@@ -124,9 +124,10 @@ class YouZanClient(object):
         content, error = self.get_resource(method=method, token=token)
         return content, error
 
-    def get_order_info_on_buyer_id(self, buyer_id, token=None):
+    def get_order_info_on_buyer_id(self, buyer_id, page, size, token=None):
         method = 'kdt.trades.sold.get'
-        content_error = self.get_resource(method=method, token=token, params={'buyer_id': buyer_id})
+        content, error = self.get_resource(method=method, token=token,
+                                           params={'buyer_id': buyer_id, 'page_no': page, 'page_size': size})
         return content, error
 
 
