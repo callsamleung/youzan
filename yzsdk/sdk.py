@@ -148,13 +148,9 @@ class YouZanDevelopClient(object):
     def access_token(self, token):
         self._access_token = token
 
-    def sync_user(self, user_id):
+    def sync_user(self, data):
         sync_url = 'https://wap.koudaitong.com/v2/buyer/kdtunion/index.json?'
         headers = {'Content-type': 'application/json', 'User-Agent': "KdtUnion_" + self._ua}
-        data = {
-            "user_id": user_id
-        }
-        print data, headers
         data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         rsp = requests.post(sync_url, data=data, headers=headers, verify=False)
         return self._process_response(rsp)
