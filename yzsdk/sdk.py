@@ -61,7 +61,10 @@ class YouZanClient(object):
         data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         rsp = requests.post(self.access_token_url, data=data, headers=headers, verify=False)
         content, error = self._process_response(rsp)
-        self.set_access_token(content['access_token'])
+        if not error and 'access_token' in content:
+            self.set_access_token(content['access_token'])
+        else:
+            error = content
         return content, error
 
     def refresh_token(self, refresh_token, scope=None):

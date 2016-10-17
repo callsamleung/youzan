@@ -3,8 +3,8 @@ from yzsdk.sdk import YouZanClient
 from django.shortcuts import redirect
 # Create your views here.
 
-client = YouZanClient('ee709b850e9dddsfds', '10bbc0de5dfsddsfdssd',
-                      'http://youzan.tunnel.phpor.me/youzan/')
+client = YouZanClient('ee709b850e953e912b', '10bbc0de502b27a4cba5df65d33e2d20',
+                      'http://admin.dingdone.com/youzan_callback/')
 
 
 def home(request):
