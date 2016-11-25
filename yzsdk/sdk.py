@@ -63,8 +63,6 @@ class YouZanClient(object):
         content, error = self._process_response(rsp)
         if not error and 'access_token' in content:
             self.set_access_token(content['access_token'])
-        else:
-            error = content
         return content, error
 
     def refresh_token(self, refresh_token, scope=None):
