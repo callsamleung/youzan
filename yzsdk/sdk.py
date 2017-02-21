@@ -6,9 +6,9 @@ import urllib
 
 class YouZanClient(object):
 
-    access_token_url = "https://open.koudaitong.com/oauth/token"
-    resource_url = "https://open.koudaitong.com/api/oauthentry"
-    authorize_url = "https://open.koudaitong.com/oauth/authorize"
+    access_token_url = "https://open.youzan.com/oauth/token"
+    resource_url = "https://open.youzan.com/api/oauthentry"
+    authorize_url = "https://open.youzan.com/oauth/authorize"
     _access_token = None
     state = 'teststate'
 
@@ -134,8 +134,8 @@ class YouZanClient(object):
 
 
 class YouZanDevelopClient(object):
-    access_token_url = "https://open.koudaitong.com/oauth/token"
-    resource_url = "https://open.koudaitong.com/api/oauthentry"
+    access_token_url = "https://open.youzan.com/oauth/token"
+    resource_url = "https://open.youzan.com/api/oauthentry"
 
     def __init__(self, client_id='', client_secret='', ua=''):
         self._ua = ua
