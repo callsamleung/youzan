@@ -1,8 +1,13 @@
+# -*- coding: utf-8 -*-
 import requests
 import json
 import time
 import urllib
-
+import datetime
+import collections
+import hashlib
+# 关闭 https 提醒
+requests.packages.urllib3.disable_warnings()
 
 class YouZanClient(object):
 
@@ -136,6 +141,7 @@ class YouZanClient(object):
 class YouZanDevelopClient(object):
     access_token_url = "https://open.youzan.com/oauth/token"
     resource_url = "https://open.youzan.com/api/oauthentry"
+    user_url = "https://uic.youzan.com/sso/open/"
 
     def __init__(self, client_id='', client_secret='', ua=''):
         self._ua = ua
@@ -155,6 +161,36 @@ class YouZanDevelopClient(object):
         headers = {'Content-type': 'application/json', 'User-Agent': "KdtUnion_" + self._ua}
         data = json.dumps(data, ensure_ascii=False).encode('utf-8')
         rsp = requests.post(sync_url, data=data, headers=headers, verify=False)
+        return self._process_response(rsp)
+
+    def init_token(self):
+        sync_url = self.user_url + 'initToken'
+        data = {
+            "user_agent": self._ua,
+            "client_id": self._client_id,
+            "client_secret": self._client_secret,
+        }
+        rsp = requests.post(sync_url, data=data, verify=False)
+        return self._process_response(rsp)
+
+    def login_user(self, data):
+        sync_url = self.user_url + 'login'
+        data.update(
+            {"user_agent": self._ua,
+             "client_id": self._client_id,
+             "client_secret": self._client_secret}
+        )
+        rsp = requests.post(sync_url, data=data, verify=False)
+        return self._process_response(rsp)
+
+    def logout_user(self, data):
+        sync_url = self.user_url + 'logout'
+        data.update(
+            {"user_agent": self._ua,
+             "client_id": self._client_id,
+             "client_secret": self._client_secret}
+        )
+        rsp = requests.post(sync_url, data=data, verify=False)
         return self._process_response(rsp)
 
     def send_message_to_youzan(self, data):
@@ -218,11 +254,105 @@ class YouZanDevelopClient(object):
         return content, None
 
 
+class YouZanPayClient(object):
+
+    def __init__(self, app_id, app_secret, partner_id,
+                 request_url="https://open.youzan.com/api/entry/"):
+        self.app_id = app_id
+        self.app_secret = app_secret
+        self.request_url = request_url
+        self.partner_id = partner_id
+        self.api_version = '1.0.0'
+
+    def post(self, apiname, data):
+        service = apiname[0: apiname.rindex('.')]
+        action = apiname[apiname.rindex('.') + 1: len(apiname)]
+        url = self.request_url + service + '/' +\
+            self.api_version + '/' + action
+        post_data = self._build_common_request_data(data)
+        rsp = requests.post(url=url, data=post_data, verify=False)
+        return self._process_response(rsp)
+
+    def _youzan_pay_exception_map(self, error_id):
+        error = {
+            "117400004": u"请求参数错误",
+            "117400008": u"商户重复注册其下的用户",
+            "117400009": u"父商户号的账号角色不为商户",
+            "117400006": u"输入的商户号不存在",
+            "117400003": u"未知异常",
+            "112200100": u"处理成功",
+            "112000000": u"重复支付",
+            "112200001": u"处理失败",
+            "112200002": u"未知异常",
+            "112200003": u"系统错误",
+            "112200004": u"参数错误",
+            "112202005": u"用户Token错误",
+            "112202006": u"三方支付工具没有返回deepLink",
+            "112202007": u"三方支付工具预支付失败",
+            "112202008": u"商户配置信息错误",
+            "114999986": u"支付工具异常",
+            "114999979": u"支付模式不存在",
+        }.get(error_id, u"未知异常")
+        return error
+
+    def _build_common_request_data(self, data):
+        timestamp = datetime.datetime.now().strftime(
+            '%Y-%m-%d %H:%M:%S')
+        post_data = {
+            'app_id': self.app_id,
+            'app_secret': self.app_secret,
+            'parentUserNo': self.partner_id,
+            'timestamp': timestamp,
+            'v': self.api_version,
+            'format': 'json',
+            'sign_method': 'md5',
+        }
+        post_data = dict(post_data.items() + data.items())
+        sorted_param_map = sorted(post_data.items(),
+                                  key=lambda d: d[0])
+        plain_text = self.app_secret
+        for item in sorted_param_map:
+            plain_text += (unicode(item[0]) + unicode(item[1]))
+        plain_text += self.app_secret
+        md5 = hashlib.md5(plain_text.encode("utf8")).hexdigest()
+        post_data['sign'] = md5
+        return post_data
+
+    def _process_response(self, rsp):
+        if rsp.status_code != 200:
+            return None, APIError(rsp.status_code, "http_error")
+        try:
+            ret_content = rsp.json()
+            content = ret_content['response']
+        except:
+            return None, APIError('9999', 'invald rsp')
+        if 'success' not in content:
+            return None, APIError('9999', 'Error Content:%s' % content)
+        if not content['success']:
+            if 'msg' in content:
+                error_code = content.get('resultCode', '9988')
+                error_msg = content.get('msg', '')
+            elif 'commonError' in content:
+                commonError = content['commonError']
+                error_code = commonError.get('errorCode', '9988')
+                error_msg = commonError.get('errorMessage', '')
+            else:
+                error_code = content.get('errorCode', '9987')
+                error_msg = self._youzan_pay_exception_map(error_code)
+            return None, APIError(error_code, error_msg)
+        return content, None
+
+
 class APIError(object):
 
     def __init__(self, code, description):
         self.code = code
         self.description = description
 
-    def _repr__(self):
-        return 'YZError: The error code is %s and msg is %s' % (self.code, self.description)
+    def __str__(self):
+        return u'YZError: code: %s msg: %s' % (
+            self.code, self.description)
+
+    def __unicode__(self):
+        return u'YZError: code: %s msg: %s' % (
+            self.code, self.description)
