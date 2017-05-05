@@ -3,8 +3,6 @@ import requests
 import json
 import time
 import urllib
-import datetime
-import collections
 # 关闭 https 提醒
 requests.packages.urllib3.disable_warnings()
 
