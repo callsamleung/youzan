@@ -1,13 +1,19 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
-from yzsdk import VERSION
+import re
 
 url = 'steinliber.github.io'
 long_description = 'YouZan Python SDK'
 
+with open('yzsdk/__init__.py', 'r') as fd:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE).group(1)
+
+if not version:
+    raise RuntimeError('Cannot find version information')
+
 setup(name='yzsdk',
-      version=VERSION,
+      version=version,
       description=long_description,
       maintainer='meng',
       maintainer_email='18657532086@163.com',
